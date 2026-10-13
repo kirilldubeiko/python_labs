@@ -1,4 +1,4 @@
-
+"""Функции меню."""
 from lab.models import Student
 from lab.io_utils import load_students, save_students, export_top_n
 from lab.processing import (
@@ -8,7 +8,8 @@ from lab.processing import (
 )
 from lab.errors import *
 
-def show_menu():
+def show_menu() -> None:
+    """Показывает меню"""
     print("Меню")
     print("1. Загрузка из CSV")
     print("2. Сохранение в CSV")
@@ -21,7 +22,8 @@ def show_menu():
     print("9. Сортировка")
     print("0. Выход")
 
-def show_all_students(students):
+def show_all_students(students: list[Student]) -> None:
+    """Выводит таблицу студентов"""
     if not students:
         print("Список пуст.")
         return
@@ -31,7 +33,8 @@ def show_all_students(students):
             grades = " ".join(str(g) if g is not None else "—" for g in s.grade_list)
             print(f"{s.student_id:<5} {s.full_name:<25} {grades:<20} {s.average_grade:<8.2f}")
 
-def input_grades():
+def input_grades() -> list[int|None]:
+    """Ввод оценок студента"""
     raw = input("Оценки через пробел(если оценки нет, то -): ").strip()
     if not raw:
         return []
@@ -49,14 +52,16 @@ def input_grades():
         grades.append(g)
     return grades
 
-def input_id(prompt):
+def input_id(prompt: str) -> int:
+    """Возвращает айди студента"""
     student_id = input(prompt).strip()
     try:
         return int(student_id)
     except ValueError:
         raise ValidationError(f"id должен быть числом: {student_id}")
 
-def main():
+def main() -> None:
+    """Работа с меню"""
     students = []
     while True:
         show_menu()

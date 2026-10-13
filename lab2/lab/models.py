@@ -1,7 +1,8 @@
 from lab.errors import ValidationError
 
 class Student:
-    def __init__(self, student_id, full_name, grade_list=None):
+    """Модель студента, поля id, full_name, grade_list."""
+    def __init__(self, student_id: int, full_name: str, grade_list: list[int|None] = None):
         if not isinstance(student_id, int) or student_id <= 0:
             raise ValidationError(f'Некорректный id:{student_id}.')
         if not isinstance(full_name, str) or not full_name.strip():
@@ -19,7 +20,8 @@ class Student:
                 raise ValidationError(f"Некорректная оценка{self.grade_list[i]}")
 
     @property
-    def average_grade(self):
+    def average_grade(self) -> float:
+        """Считает среднее арифметическое оценок студента."""
         grade_sum = 0
         none_counter = 0
         if len(self.grade_list) == self.grade_list.count(None):
