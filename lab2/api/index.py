@@ -26,7 +26,8 @@ def root():
     return render_template(
         "index.html",
         students=students,
-        stats=stats
+        stats=stats,
+        passed=60
     )
 
 
