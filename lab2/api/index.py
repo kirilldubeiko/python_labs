@@ -12,7 +12,7 @@ from lab.models import Student
 from lab.processing import count_group_statistics
 from lab.errors import AppError
 
-NGROK_URL = ' https://resisting-yippee-maybe.ngrok-free.dev'
+NGROK_URL = 'https://resisting-yippee-maybe.ngrok-free.dev'
 
 app = Flask(__name__, template_folder=".")
 
