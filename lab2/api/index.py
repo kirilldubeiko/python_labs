@@ -1,52 +1,54 @@
 import os
 import sys
-import io
-import csv
-import requests
+from flask import Flask, render_template, send_file, jsonify
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, BASE_DIR)
 
-from flask import Flask, render_template
-from lab.models import Student
+from lab.io_utils import load_students
 from lab.processing import count_group_statistics
 from lab.errors import AppError
 
-NGROK_URL = 'https://resisting-yippee-maybe.ngrok-free.dev/data/students.csv'
-
+DATA_FILE = os.path.join(BASE_DIR, "data", "students.csv")
 app = Flask(__name__, template_folder=".")
+
+
+def get_version() -> str:
+
+    try:
+        st = os.stat(DATA_FILE)
+        return f"{st.st_mtime_ns}-{st.st_size}"
+    except OSError:
+        return "0"
 
 
 @app.route("/")
 def root():
-    students = []
-    
+    version = get_version()
     try:
-        response = requests.get(NGROK_URL, timeout=5)
-        response.raise_for_status()
-
-        reader = csv.reader(io.StringIO(response.text))
-        next(reader, None)
-
-        for row in reader:
-            if not row or not row[0].strip():
-                continue
-            sid = int(row[0])
-            name = row[1]
-            grades = [int(x) if x.strip() else None for x in row[2:]]
-            students.append(Student(sid, name, grades))
-            
-    except Exception as e:
-        print(f"Ошибка: {e}")
+        students = load_students(DATA_FILE, has_header=True)
+    except AppError:
+        students = []
 
     stats = count_group_statistics(students)
-            
+
     return render_template(
         "index.html",
         students=students,
         stats=stats,
-        passed=60
+        passed=60,
+        version=version,
     )
+
+
+@app.route("/version")
+def version():
+    return jsonify(version=get_version())
+
+
+@app.route("/data/students.csv")
+def get_csv():
+    return send_file(DATA_FILE, mimetype="text/csv")
 
 
 if __name__ == "__main__":
