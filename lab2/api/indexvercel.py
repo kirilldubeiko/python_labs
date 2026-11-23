@@ -22,8 +22,13 @@ def root():
     students = []
 
     try:
-        response = requests.get(NGROK_URL, timeout=5)
+        response = requests.get(
+            NGROK_URL,
+            timeout=10,
+            headers={"ngrok-skip-browser-warning": "1"},
+        )       
         response.raise_for_status()
+        response.encoding = "utf-8"
 
         reader = csv.reader(io.StringIO(response.text))
         next(reader, None)
